@@ -521,7 +521,7 @@ NoneParsedLines = open(CAT_dir + "NoneParsedLines.txt", "w")
 with open(CitrixFile) as file1:
     for line_from_Citrix in file1:
         line_from_Citrix = line_from_Citrix.rstrip()
-        with open("C:\\Users\yehudap\Desktop\CAT\ParsedLines.txt") as file2:
+        with open(ParsedLines) as file2:
             for line_from_parsed in file2:
                 line_from_parsed = line_from_parsed.rstrip()
                 if line_from_parsed == line_from_Citrix:
