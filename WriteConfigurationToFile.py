@@ -1,17 +1,10 @@
-print("Yehuda Pinchas ABC")
 import uuid
-import requests
-import json
-import urllib3
 import os
 
 a = uuid.uuid3(uuid.NAMESPACE_DNS, 'foo')
 print(a)
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-
-# A list of reals to make sure that the object is real and not other paramenter (when attaching real to group).
+# A list of reals to make sure that the object is real and not other parameter (when attaching real to group).
 reals_list = []
 group_list = []
 #A list of combined SSL policies (FE & BE)
@@ -50,15 +43,15 @@ RealID_to_RealIP_mapping = {
 CAT_dir = 'C:\\Users\yehudap\Desktop\CAT\\'
 arr = os.listdir(CAT_dir)
 for i in arr:
-    if i.startswith('td'):
-        f = open(CAT_dir + i, 'r+')
-        f.truncate(0)
+    if i != 'Citrix.txt':
+        os.remove(CAT_dir + i)
 
-ParsedLines = open("C:\\Users\yehudap\Desktop\CAT\ParsedLines.txt", "w")
+ParsedLines = open(CAT_dir + "ParsedLines.txt", "w")
+CitrixFile = CAT_dir + "Citrix.txt"
 
 
 def compare_conf(line_to_compare):
-    with open("C:\\Users\yehudap\Desktop\CAT\ParsedLines.txt") as file:
+    with open(CAT_dir + "ParsedLines.txt") as file:
         for line in file:
             line = line.rstrip()
             if line_to_compare == line:
@@ -76,12 +69,12 @@ def get_td(line, element, type):
         print(td)
         return td
     elif type == "SSL":
-            with open(r"C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file1:
+            with open(CitrixFile) as file1:
                 for line_from_Citrix in file1:
                     line_from_Citrix = line_from_Citrix.rstrip()
                     if line_from_Citrix.startswith("set ssl vserver") and "-sslProfile " + element in line_from_Citrix:
                         virt_from_attaching_ssl_policy = line_from_Citrix.split()[3]
-                        with open(r"C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file2:
+                        with open(CitrixFile) as file2:
                             for line_from_Citrix2 in file2:
                                 line_from_Citrix2 = line_from_Citrix2.rstrip()
                                 if line_from_Citrix2.startswith("add lb vserver"):
@@ -94,7 +87,7 @@ def get_td(line, element, type):
 
 
 
-# cert_dir = 'C:\\Users\yehudap\Desktop\CAT\certs\\'
+# cert_dir = CAT_dir + "certs"
 # arr = os.listdir(cert_dir)
 # for i in arr:
 #     if i.endswith('.pem') or i.endswith('.crt') or i.endswith('.key'):
@@ -125,7 +118,7 @@ def get_td(line, element, type):
 
 
 
-with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file:
+with open(CitrixFile) as file:
     for line in file:
         print(line.rstrip())
         line = line.rstrip()
@@ -144,7 +137,7 @@ with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file:
             type = "Real"
 
             td = get_td(line, element, type)
-            filePath = "C:\\Users\yehudap\Desktop\CAT\%s.txt" % ("td_" + str(td))
+            filePath = CAT_dir + "%s.txt" % ("td_" + str(td))
             Alteon_config = open(filePath, "a")
 
             Alteon_config.write("/c/slb/real " + RealIP + "\n")
@@ -161,7 +154,7 @@ with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file:
 
             compare_conf(line)
 
-            with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file_to_get_port:
+            with open(CitrixFile) as file_to_get_port:
                 for line_to_get_port in file_to_get_port:
                     #print(line_to_get_port.rstrip())
                     line_to_get_port = line_to_get_port.rstrip()
@@ -196,7 +189,7 @@ with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file:
             type = "Group"
 
             td = get_td(line, element, type)
-            filePath = "C:\\Users\yehudap\Desktop\CAT\%s.txt" % ("td_" + str(td))
+            filePath = CAT_dir + "%s.txt" % ("td_" + str(td))
             Alteon_config = open(filePath, "a")
 
             Alteon_config.write("/c/slb/group " + group_uuid + "\n")
@@ -210,14 +203,14 @@ with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file:
 
             compare_conf(line)
 
-            with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file_for_attach_real:
+            with open(CitrixFile) as file_for_attach_real:
                 for line_for_attach_real in file_for_attach_real:
                     line_for_attach_real = line_for_attach_real.rstrip()
-                    print(line_for_attach_real)
+                    #print(line_for_attach_real)
                     if (line_for_attach_real.startswith('bind serviceGroup')):
-                        print("LLLLLLLLLLLLLLLLLLLLL " + line_for_attach_real)
+                        #print("line_for_attach_real: " + line_for_attach_real)
                         GroupID_from_attach_real = (line_for_attach_real.split()[2])
-                        print("GGGGGGGGGGGGGGGGGGGGG " + GroupID_from_attach_real)
+                        #print("GroupID_from_attach_real: " + GroupID_from_attach_real)
                         element_to_check = (line_for_attach_real.split()[3])
                         if GroupID_from_attach_real == GroupID:
                             if (element_to_check in reals_list):
@@ -265,7 +258,7 @@ with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file:
                 type = "SSL"
 
                 td = get_td(line, element, type)
-                filePath = "C:\\Users\yehudap\Desktop\CAT\%s.txt" % ("td_" + str(td))
+                filePath = CAT_dir + "%s.txt" % ("td_" + str(td))
                 Alteon_config = open(filePath, "a")
 
                 Alteon_config.write("/c/slb/ssl/sslpol " + ssl_profile + "\n")
@@ -281,7 +274,7 @@ with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file:
                 #for_checking = SSL_Policy_ID.replace('Client', 'Server')
 
 
-                #with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file_ssl_policy_mode:
+                #with open(CitrixFile) as file_ssl_policy_mode:
                     #for line_ssl_policy_mode in file_ssl_policy_mode:
                         #line_ssl_policy_mode = line_ssl_policy_mode.rstrip()
 
@@ -313,7 +306,7 @@ with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file:
 
             create_virt = 1
             if Service_name == "HTTP":
-                with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file:
+                with open(CitrixFile) as file:
                     for line_for_http in file:
                         #print(line_for_http.rstrip())
                         line_for_http = line_for_http.rstrip()
@@ -332,7 +325,7 @@ with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file:
                 type = "VIP"
 
                 td = get_td(line, element, type)
-                filePath = "C:\\Users\yehudap\Desktop\CAT\%s.txt" % ("td_" + str(td))
+                filePath = CAT_dir + "%s.txt" % ("td_" + str(td))
                 Alteon_config = open(filePath, "a")
 
                 Alteon_config.write("/c/slb/virt " + VIP_uuid + "\n")
@@ -350,7 +343,7 @@ with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file:
                 Alteon_config.write("/c/slb/virt " + VIP_uuid + "/service " + VIP_port + " " + service + "\n")
 
                 compare_conf(line)
-                with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file1:
+                with open(CitrixFile) as file1:
                     for line1 in file1:
                         line1 = line1.rstrip()
                         if (line1.startswith('bind lb vserver')):
@@ -378,7 +371,7 @@ with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file:
                                     compare_conf(line1)
 
 
-                                with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file2:
+                                with open(CitrixFile) as file2:
                                     for line2 in file2:
                                         line2 = line2.rstrip()
                                         if (line2.startswith('add serviceGroup')):
@@ -398,7 +391,7 @@ with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file:
                                                 except:
                                                     print("port is not defined")
 
-                                                with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file3:
+                                                with open(CitrixFile) as file3:
                                                     for line3 in file3:
                                                         line3 = line3.rstrip()
                                                         if (line3.startswith('set ssl vserver')):
@@ -476,7 +469,7 @@ with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file:
                                                     Alteon_config.write("\txforward ena " + "\n")
                                                     compare_conf(line2)
 
-                                                with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file4:
+                                                with open(CitrixFile) as file4:
                                                     for line4 in file4:
                                                         line4 = line4.rstrip()
                                                         if (line4.startswith('bind ssl vserver')) and "-CA" not in line4:
@@ -489,7 +482,7 @@ with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file:
                                                                 Alteon_config.write("\tsrvrcert cert "+ certName + "\n")
                                                                 compare_conf(line4)
 
-                                                                with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file5:
+                                                                with open(CitrixFile) as file5:
                                                                     for line5 in file5:
                                                                         line5 = line5.rstrip()
                                                                         if (line5.startswith('set ssl vserver')):
@@ -520,9 +513,12 @@ with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file:
 
 
 #Write the None Parsed lines to the new file
-NoneParsedLines = open(r"C:\\Users\yehudap\Desktop\CAT\NoneParsedLines.txt", "w")
+ParsedLines.close
 
-with open("C:\\Users\yehudap\Desktop\CAT\Citrix.txt") as file1:
+ParsedLines = CAT_dir + "ParsedLines.txt"
+NoneParsedLines = open(CAT_dir + "NoneParsedLines.txt", "w")
+
+with open(CitrixFile) as file1:
     for line_from_Citrix in file1:
         line_from_Citrix = line_from_Citrix.rstrip()
         with open("C:\\Users\yehudap\Desktop\CAT\ParsedLines.txt") as file2:
